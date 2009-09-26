@@ -1,0 +1,119 @@
+By: 
+	Spicer Matthews <spicer@cloudmanic.com>
+	Cloudmanic Labs, LLC
+	http://www.cloudmanic.com
+
+Based On:
+	http://codeigniter.com/wiki/Migrations/
+	By: Mat'as Montes
+
+Description: 
+	An open source utility for Codeigniter inspired by Ruby on Rails.
+
+	The one thing Ruby on Rails has that Codeigniter does not have built in
+	is database migrations. That function to keep track of database chages (versions)
+	and migrate your database to what ever version you need. Migrate up or migrate down.
+	With this library you can now do this. This library is not complete, please read
+	http://codeigniter.com/wiki/Migrations for future needs and issues. This "fork" of 
+	Mat'as orginal work just tweets something to work better in our work. Both Libraries
+	are powerful and work in nearly the same way. Maybe someday we can create a joint project 
+	with Mat'as or even better get this into that core of Codeigniter.
+
+Install:
+	Copy the files to these locations.
+	
+	migrate.php -> application/libraries/
+	dbmigrate.php -> applcation/controllers/
+
+	The migration files included in this are just examples. You should install them where ever you 
+	point your $config["migrations_path"] to.
+	
+	Add these config to your config.php
+
+	/*
+	|--------------------------------------------------------------------------
+	| Enable/Disable Migrations
+	|--------------------------------------------------------------------------
+	|
+	| Migrations are disabled by default for security reasons.
+	| You should enable migrations whenever you intend to do a schema migration
+	| and disable it back when you're done.
+	|
+	| Some more severe security measures might take place in future releases.
+	|
+	*/
+	$config["migrations_enabled"] = TRUE;
+
+	/*
+	|--------------------------------------------------------------------------
+	| Migrations Path
+	|--------------------------------------------------------------------------
+	|
+	| Path to your migrations folder.
+	| Typically, it will be within your application path.
+	| Also, writing permission is required within the migrations path.
+	|
+	*/
+	$config["migrations_path"] = APPPATH . "migrations/";
+
+
+	/*
+	|--------------------------------------------------------------------------
+	| Migrations version
+	|--------------------------------------------------------------------------
+	|
+	| This is used to set the default migration for this code base. 
+	| Sometimes you want the system to automaticly migrate the database
+	| to the most current migration. Or there might be higher migrations
+	| that are not part of the production env. Setting the migration does 
+	| does nothing here. It is a way for a programer to check the config.
+	|
+	| On login you might want to do something like this 
+	| $this->migrate->version($this->config->item('migrations_version'));
+	|
+	*/
+	$config["migrations_version"] = 6;
+ 
+Usage:
+	The code is all based out of a library so you can call it anywhere with.
+	
+	$this->load->library('migrate');
+	$this->migrate->setverbose(TRUE); // echo statments or not
+	$this->migrate->version(id); // migrate the database to a particular version
+	$this->migrate->install(); // install to the latest version.
+
+	The dbmigreate.php controller just shows the use of these functions. If you are going to use it.
+	remove the 'die();' and put it back in place when you are done.
+
+	** THE KICKER **
+	At the bottom of migreate.php we assume you are keeping track of your versions with a db table called config. Yes
+	you can not use this migration script to create that table. You need at least one table installed to boot strap this.
+	You will want to review the _update_schema_version() function to either modify or copy how it works. 
+
+	Also, in our applcations we have this code to set our applcation configs. We do not believe in writting to the file system
+	that is what a database is for :).
+
+	//
+	// Setup Config.
+	//
+	function setup_system_config()
+	{
+		$query = $this->db->get('config');
+		foreach ($query->result() AS $row)
+			$this->config->set_item($row->Config_Name, $row->Config_Data);
+	}
+
+	In this code we set. $this->CI->config->item('migrationversion'); and that is how _get_schema_version() 
+	gets the current version. This is the version this database is set too.
+
+	** Suggestion **
+	We also do this on login to make sure this database is migrated to the version the config files wants it to be migrated too.
+	
+	// Make sure our database is up-to-date
+	$this->migrate->setverbose(FALSE);
+	if(! $this->migrate->version($this->config->item('migrations_version')))
+		show_error($this->migrate->error);
+
+
+	Over all you should read this and http://codeigniter.com/wiki/Migrations to get an over all feel for this and make any changes 
+	you need for your applcation.
