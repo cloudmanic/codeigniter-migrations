@@ -117,3 +117,15 @@ Usage:
 
 	Over all you should read this and http://codeigniter.com/wiki/Migrations to get an over all feel for this and make any changes 
 	you need for your applcation.
+	
+
+Other Helpful Stuff:
+
+Included in this git repo is an example system.php file. A way to have migrations run on every page load. You can copy it directly or use it as an example for your own code structure. 
+
+When you auto load the system.php lib this should be your order: $autoload['libraries'] = array('database', 'migrate', 'system', 'session');
+
+Here is a video walk through of migrations in action. 
+
+http://www.vimeo.com/13490644
+	
